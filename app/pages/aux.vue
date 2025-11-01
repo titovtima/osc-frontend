@@ -1,29 +1,59 @@
 <template>
   <div>
-    <Channel name="channel name" :value="channelValue" @update:value="(value) => sendToServer(13, 1, value)"/>
+    <div>
+      <select ref="selectAuxElem" @change="changeAux(selectAuxElem.value)">
+        <option v-for="aux in auxes" :value="aux.number" :selected="currentAuxNum+1==aux.number" @click="changeAux(aux.number)">{{ aux.name }}</option>
+      </select>
+    </div>
+    <ChannelShow v-for="channel in channels" :name="channel.name" 
+      :value="values[currentAuxNum][channel.number]" @update:value="(value) => sendToServer(channel.number, currentAuxNum, value)"/>
   </div>
 </template>
 
 <script setup lang="ts">
-// const host = '10.240.107.95:8002/'
-// const host = '127.0.0.1:8002/'
-const host = '192.168.1.109:8002'
-// const host = 'http://10.96.250.95:8002/'
-// const host = 'http://127.0.0.1:8002/'
+const selectAuxElem: Ref<any> = ref(null);
+const currentAuxNum = ref(0);
 
-const channelValue = ref(0);
+const channels: Ref<Array<any>> = ref([]);
+const auxes: Ref<Array<any>> = ref([{number: 0, name: "aux 0", color: "ffffff"}]);
+
+const maxAux = 4;
+const maxChannel = 4;
+
+const values: Ref<any> = ref(new Array(maxAux));
+for (let i = 0; i < maxAux; i++) {
+  values.value[i] = new Array<number>(maxChannel).fill(0);
+}
+
+function changeAux(num: number) {
+  console.log('changeAux for ' + num);
+  currentAuxNum.value = num;
+  console.log(values.value[currentAuxNum.value]);
+  console.log(values.value);
+}
+
+fetch(httpHost + "/channels").then(res => res.json()).then(res => {
+  channels.value = res.channels;
+  createWs();
+});
+
+fetch(httpHost + "/auxes").then(res => res.json()).then(res => {
+  auxes.value = res.auxes;
+  currentAuxNum.value = 1;
+});
 
 let ws = new WebSocket("ws://" + host);
-
-createWs();
 
 function createWs() {
   let ws = new WebSocket("ws://" + host);
 
   ws.onmessage = (event) => {
     let data = JSON.parse(event.data);
-    if (data.address == '/channel/13/fader') {
-      channelValue.value = data.args[0];
+    let levels: string[] = data.address.split('/');
+    if (levels.length == 6 && levels[1] == 'channel' && levels[3] == 'send' && levels[5] == 'level') {
+      let channelNum = Number(levels[2]);
+      let auxNum = Number(levels[4]);
+      values.value[auxNum][channelNum] = data.args[0];
     }
   };
 
@@ -42,8 +72,6 @@ function createWs() {
 }
 
 function sendToServer(channel: number, aux: number, value: number) {
-  ws.send(JSON.stringify({address: '/channel/13/fader', args: [value]}))
+  ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/level', args: [value]}))
 }
-
-
 </script>

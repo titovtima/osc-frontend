@@ -2,7 +2,7 @@
   <div>
     <div>
       <select ref="selectAuxElem" @change="changeAux(selectAuxElem.value)">
-        <option v-for="aux in auxes" :value="aux.number" :selected="currentAuxNum+1==aux.number" @click="changeAux(aux.number)">{{ aux.name }}</option>
+        <option v-for="aux in auxes" :value="aux.number">{{ aux.name }}</option>
       </select>
     </div>
     <ChannelShow v-for="channel in channels" :name="channel.name" 
@@ -28,8 +28,6 @@ for (let i = 0; i < maxAux; i++) {
 function changeAux(num: number) {
   console.log('changeAux for ' + num);
   currentAuxNum.value = num;
-  console.log(values.value[currentAuxNum.value]);
-  console.log(values.value);
 }
 
 fetch(httpHost + "/channels").then(res => res.json()).then(res => {

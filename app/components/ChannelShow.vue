@@ -3,12 +3,14 @@
     <div class="channel-header">
       <div class="channel-number">{{ number }}</div>
       <div class="channel-name">{{ name }}</div>
+      <button @click="panShow = !panShow" class="pan-show-btn" style="float: right;">
+        {{ (panShow) ? 'pan' : 'lvl' }}
+      </button>
     </div>
     
     <div class="controls-row">
       <!-- Level Control -->
-      <div class="control-group">
-        <div class="control-label">LVL</div>
+      <div v-if="!panShow" class="control-group">
         <div class="level-control-compact">
           <div 
             class="level-track-container"
@@ -50,8 +52,7 @@
       </div>
 
       <!-- Pan Control -->
-      <div class="control-group">
-        <div class="control-label">PAN</div>
+      <div v-else class="control-group">
         <div class="pan-control-compact">
           <div 
             class="pan-track-container"
@@ -118,6 +119,7 @@ let bar = ref();
 let barContainer = ref();
 let panElem = ref();
 let panContainer = ref();
+let panShow = ref(false);
 
 let panRef = ref(props.pan);
 watch(() => props.pan, () => {
@@ -353,7 +355,7 @@ onDeactivated(() => {
   margin-bottom: 0.75rem;
 }
 
-.channel-number {
+.channel-number, .pan-show-btn {
   font-size: 0.8rem;
   color: #00b4db;
   font-weight: 600;

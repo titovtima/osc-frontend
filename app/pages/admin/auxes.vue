@@ -10,10 +10,12 @@
 <script setup lang="ts">
 const channels: Ref<any[]> = ref([]);
 
-loadConfigPromise.then(() => {
-    fetch('http://' + config.host + '/auxes').then(res => res.json()).then(res => {
-        channels.value = res.auxes;
-    });
+let config: any;
+getConfig().then(res => {
+  config = res;
+  fetch('http://' + config.host + '/auxes').then(res => res.json()).then(res => {
+      channels.value = res.auxes;
+  });
 })
 
 function addChannel() {

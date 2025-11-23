@@ -12,7 +12,9 @@ import ChannelGroupSetup from '~/components/ChannelGroupSetup.vue';
 
 const channelGroups: Ref<channelGroup[]> = ref([]);
 
-loadConfigPromise.then(() => {
+let config: any
+getConfig().then(res => {
+  config = res;
   fetch('http://' + config.host + '/channels').then(res => res.json()).then(res => {
     channelGroups.value = res.channels;
   });

@@ -31,12 +31,6 @@
         :pans="pans[currentAuxNum]" 
         @update:pan="(value: number, channelNum: number) => sendPanToServer(channelNum, value)"
       />
-      <!-- <ChannelShow 
-        v-for="channel in channels" 
-        :key="channel.number"
-        :name="channel.name" 
-        :number="channel.number"
-      /> -->
     </div>
 
     <div class="mixer-footer">
@@ -68,9 +62,6 @@ function changeAux(num: number) {
   currentAuxNum.value = num;
   localStorage.setItem(localStorageCurrentAuxKey, String(num));
 }
-
-// const config = await getConfig();
-// console.log(config);
 
 let config: any
 getConfig().then(res => {

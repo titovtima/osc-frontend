@@ -185,12 +185,7 @@ function handleLevelClick(event: MouseEvent) {
   console.log('clampedValue', clampedValue);
   levelRef.value = sliderToDb(clampedValue);
   console.log('levelRef', levelRef.value);
-  // if (config.consoleType == 's')
-  //   levelRef.value = sliderToDb(clampedValue);
-  // else
-  //   levelRef.value = clampedValue / maxValue;
   emit('update:level', levelRef.value);
-  // emit('update:level', clampedValue / 100.0);
 }
 
 function handlePanClick(event: MouseEvent) {
@@ -200,12 +195,7 @@ function handlePanClick(event: MouseEvent) {
   const newValue = ((event.clientX - rect.left) / rect.width) * 100;
   const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
   panRef.value = sliderToPan(clampedValue);
-  // if (config.consoleType == 's')
-  //   panRef.value = sliderToPan(clampedValue);
-  // else
-  //   panRef.value = clampedValue / maxValue;
   emit('update:pan', panRef.value);
-  // emit('update:pan', clampedValue / 100.0);
 }
 
 // Optimized drag handlers for smooth movement

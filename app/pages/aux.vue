@@ -22,17 +22,20 @@
       </div>
     </div>
 
-    <div class="channels-container">
-      <ChannelShow 
-        v-for="channel in channels" 
-        :key="channel.number"
-        :name="channel.name" 
-        :number="channel.number"
-        :level="levels[currentAuxNum][channel.number]" 
-        @update:level="(value) => sendLevelToServer(channel.number, currentAuxNum, value)"
-        :pan="pans[currentAuxNum][channel.number]" 
-        @update:pan="(value) => sendPanToServer(channel.number, currentAuxNum, value)"
-      />
+    <div class="channels-scroll-container">
+      <div class="channels-container">
+        <ChannelGroupShow 
+          v-for="group in channelGroups" 
+          :key="group.name"
+          :group="group"
+          :current-aux-num="currentAuxNum"
+          :levels="levels"
+          :pans="pans"
+          @update:level="sendLevelToServer"
+          @update:pan="sendPanToServer"
+          @toggle-group="toggleGroup"
+        />
+      </div>
     </div>
 
     <div class="mixer-footer">
@@ -51,7 +54,7 @@ const selectAuxElem: Ref<any> = ref(null);
 const currentAuxNum = ref(0);
 const wsConnected = ref(false);
 
-const channels: Ref<Array<any>> = ref([]);
+const channelGroups: Ref<channelGroup[]> = ref([]);
 const auxes: Ref<Array<any>> = ref([{number: 0, name: "aux 0", color: "ffffff"}]);
 
 // console.log(config);
@@ -62,6 +65,9 @@ for (let i = 0; i <= config.maxAux; i++) {
   pans.value[i] = new Array<number>(config.maxChannel+1).fill(0);
 }
 
+// Track expanded/collapsed state for groups
+const groupExpandedState = ref<Record<string, boolean>>({});
+
 const localStorageCurrentAuxKey = 'currentAux';
 function changeAux(num: number) {
   console.log('changeAux for ' + num);
@@ -69,9 +75,34 @@ function changeAux(num: number) {
   localStorage.setItem(localStorageCurrentAuxKey, String(num));
 }
 
+// Toggle group expand/collapse
+function toggleGroup(groupName: string) {
+  groupExpandedState.value[groupName] = !groupExpandedState.value[groupName];
+}
+
+// Check if group is expanded
+function isGroupExpanded(groupName: string): boolean {
+  return groupExpandedState.value[groupName] !== false; // Default to expanded
+}
+
 loadConfigPromise.then(() => {
   fetch('http://' + config.host + "/channels").then(res => res.json()).then(res => {
-    channels.value = res.channels;
+    if (res.channels) {
+      channelGroups.value = res.channels;
+      // Initialize all groups as expanded by default
+      channelGroups.value.forEach(group => {
+        groupExpandedState.value[group.name] = true;
+      });
+    } else if (res.channels) {
+      // Fallback: create a single group with all channels
+      channelGroups.value = [{
+        name: "All Channels",
+        order: 0,
+        hidden: false,
+        channels: res.channels
+      }];
+      groupExpandedState.value["All Channels"] = true;
+    }
     createWs();
   });
 
@@ -135,7 +166,6 @@ function sendLevelToServer(channel: number, aux: number, value: number) {
       ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/level', args: [value]}))
     } else {
       ws.send(JSON.stringify({address: '/sd/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_level', 
-      // ws.send(JSON.stringify({address: '/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_level', 
         args: [dbToSlider(value) / 100.0]}))
     }
     levels.value[aux][channel] = value;
@@ -148,7 +178,6 @@ function sendPanToServer(channel: number, aux: number, value: number) {
       ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/pan', args: [value]}))
     } else {
       ws.send(JSON.stringify({address: '/sd/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_pan',
-      // ws.send(JSON.stringify({address: '/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_pan',
         args: [panToSlider(value) / 100.0]}))
     }
     pans.value[aux][channel] = value;
@@ -168,14 +197,15 @@ onMounted(() => {
 <style scoped>
 .mixer-container {
   min-height: 100vh;
-  min-height: 100dvh; /* Use dynamic viewport height for mobile */
+  min-height: 100dvh;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   color: white;
   padding: 0.5rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden;
+  position: relative;
 }
 
 .mixer-header {
@@ -188,7 +218,9 @@ onMounted(() => {
   border-radius: 8px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0; /* Prevent header from shrinking */
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .mixer-title {
@@ -222,16 +254,26 @@ onMounted(() => {
   min-width: 120px;
 }
 
+/* New scroll container for better mobile handling */
+.channels-scroll-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1rem;
+  min-height: 0; /* Critical for flex scrolling */
+}
+
 .channels-container {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
-  flex: 1; /* Take available space */
-  overflow-y: auto; /* Enable scrolling only for channels */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  z-index: 1;
 }
 
 /* Hide scrollbar for Webkit browsers */
@@ -248,8 +290,10 @@ onMounted(() => {
   border-radius: 8px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0; /* Prevent footer from shrinking */
-  margin-top: auto; /* Push footer to bottom */
+  flex-shrink: 0;
+  margin-top: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .status-indicator {
@@ -272,8 +316,8 @@ onMounted(() => {
 @media (max-width: 768px) {
   .mixer-container {
     padding: 0.25rem;
-    min-height: 100dvh; /* Ensure mobile viewport height */
-    height: 100dvh; /* Fixed height for mobile */
+    min-height: 100dvh;
+    height: 100dvh;
   }
   
   .mixer-header {
@@ -285,9 +329,12 @@ onMounted(() => {
     font-size: 1.1rem;
   }
   
+  .channels-scroll-container {
+    margin-bottom: 0.5rem;
+  }
+  
   .channels-container {
     gap: 0.25rem;
-    /* Remove max-height and let flex handle it */
   }
   
   .mixer-footer {
@@ -306,6 +353,11 @@ onMounted(() => {
 @supports (-webkit-touch-callout: none) {
   .mixer-container {
     min-height: -webkit-fill-available;
+  }
+  
+  /* iOS specific scroll fix */
+  .channels-scroll-container {
+    -webkit-overflow-scrolling: touch;
   }
 }
 </style>

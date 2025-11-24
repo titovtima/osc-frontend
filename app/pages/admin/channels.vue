@@ -34,6 +34,9 @@ function save() {
     return;
   }
   channelGroups.value.sort((a, b) => a.order - b.order);
+  for (let group of channelGroups.value) {
+    group.channels.sort((a, b) => a.order - b.order);
+  }
   fetch('http://' + config.host + '/channels', {
     method: 'POST',
     headers: {

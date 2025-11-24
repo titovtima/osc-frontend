@@ -28,6 +28,10 @@ const props = defineProps<{
   pans: any[]
 }>();
 
+watch(() => props.group, () => {
+  props.group.channels.sort((a, b) => a.order - b.order);
+});
+
 const emit = defineEmits(['update:level', 'update:pan']);
 
 const isExpanded = ref(true);

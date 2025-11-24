@@ -74,7 +74,8 @@ getConfig().then(res => {
   }
 
 
-  fetch('http://' + config.host + "/channels").then(res => res.json()).then(res => {
+  fetch('http://' + config.host + "/channels").then(res => res.json()).then((res: {channels: channelGroup[]}) => {
+    res.channels.sort((a, b) => a.order - b.order);
     channels.value = res.channels;
     console.log(res);
     createWs();

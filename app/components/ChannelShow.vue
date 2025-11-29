@@ -3,7 +3,7 @@
     <div class="channel-header">
       <div class="channel-number">{{ data.number }}</div>
       <div class="channel-name">{{ data.name }}</div>
-      <span>
+      <span v-if="currentAux.stereo">
         <button @click="panShow = true" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
           pan
         </button>
@@ -133,6 +133,8 @@ let levelRef = ref(props.level);
 watch(() => props.level, () => {
   levelRef.value = props.level;
 });
+
+const currentAux: Ref<aux> = useState('currentAux');
 
 // Drag state management
 let isLevelDragging = false;

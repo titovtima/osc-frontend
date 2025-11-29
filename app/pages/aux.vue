@@ -13,7 +13,7 @@
             v-for="aux in auxes" 
             :value="aux.number" 
             :key="aux.number"
-            :style="{ color: '#' + aux.color }"
+            :style="{ color: '#' + aux.color, display: aux.hidden ? 'none' : 'block' }"
             :selected="currentAuxNum == aux.number"
           >
             {{ aux.name }}
@@ -50,19 +50,30 @@
 import ChannelGroupShow from '~/components/ChannelGroupShow.vue';
 
 const selectAuxElem: Ref<any> = ref(null);
-const currentAuxNum = ref(0);
+const currentAux: Ref<aux> = useState('currentAux', () => { 
+  return {number: 0, order: 1, name: "aux 0", hidden: false, stereo: true, color: "ffffff"}});
+const currentAuxNum = computed(() => currentAux.value.number);
 const wsConnected = ref(false);
 
 const channels: Ref<channelGroup[]> = ref([{name: "group 0", order: 1, hidden: true, channels: []}]);
-const auxes: Ref<Array<any>> = ref([{number: 0, name: "aux 0", color: "ffffff"}]);
+const auxes: Ref<aux[]> = ref([{number: 0, order: 1, name: "aux 0", hidden: false, stereo: true, color: "ffffff"}]);
 
 const levels: Ref<any> = ref([]);
 const pans: Ref<any> = ref([]);
 const localStorageCurrentAuxKey = 'currentAux';
 function changeAux(num: number) {
-  console.log('changeAux for ' + num);
-  currentAuxNum.value = num;
-  localStorage.setItem(localStorageCurrentAuxKey, String(num));
+  let nexAux: aux | null = null;
+  for (let a of auxes.value) {
+    if (a.number == num) {
+      nexAux = a;
+      break;
+    }
+  }
+  if (nexAux != null) {
+    console.log('changeAux for ' + num);
+    currentAux.value = nexAux;
+    localStorage.setItem(localStorageCurrentAuxKey, String(num));
+  }
 }
 
 let config: any
@@ -75,7 +86,6 @@ getConfig().then(res => {
     pans.value[i] = new Array<number>(config.maxChannel+1).fill(0);
   }
 
-
   fetch('http://' + config.host + "/channels").then(res => res.json()).then((res: {channels: channelGroup[]}) => {
     res.channels.sort((a, b) => a.order - b.order);
     channels.value = res.channels;
@@ -83,8 +93,14 @@ getConfig().then(res => {
     createWs();
   });
 
-  fetch('http://' + config.host + "/auxes").then(res => res.json()).then(res => {
+  fetch('http://' + config.host + "/auxes").then(res => res.json()).then((res: {auxes: aux[]}) => {
+    res.auxes.sort((a, b) => a.order - b.order);
     auxes.value = res.auxes;
+    try {
+      changeAux(Number(localStorage.getItem(localStorageCurrentAuxKey)));
+    } catch(_) {}
+    if (currentAuxNum.value == 0)
+      changeAux((auxes.value[0] as aux).number);
   });
 })
 
@@ -164,15 +180,6 @@ function sendPanToServer(channel: number, value: number) {
     pans.value[aux][channel] = value;
   }
 }
-
-onMounted(() => {
-  try {
-    currentAuxNum.value = Number(localStorage.getItem(localStorageCurrentAuxKey));
-  } catch(_) {
-  }
-  if (currentAuxNum.value == 0)
-    currentAuxNum.value = 1;
-})
 </script>
 
 <style scoped>

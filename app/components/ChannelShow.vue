@@ -3,9 +3,14 @@
     <div class="channel-header">
       <div class="channel-number">{{ data.number }}</div>
       <div class="channel-name">{{ data.name }}</div>
-      <button @click="panShow = !panShow" class="pan-show-btn" style="float: right;">
-        {{ (panShow) ? 'pan' : 'lvl' }}
-      </button>
+      <span>
+        <button @click="panShow = true" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
+          pan
+        </button>
+        <button @click="panShow = false" class="pan-show-btn" :class="{ active: !panShow }" style="float: right;">
+          lvl
+        </button>
+      </span>
     </div>
     
     <div class="controls-row">
@@ -347,6 +352,11 @@ onDeactivated(() => {
   border-radius: 4px;
   min-width: 30px;
   text-align: center;
+}
+
+.active {
+  border-color: #000000 #535353 #535353 #000000 !important;
+  border-style: solid;
 }
 
 .channel-name {

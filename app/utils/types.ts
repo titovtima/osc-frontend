@@ -12,3 +12,12 @@ export type channelGroup = {
     hidden: boolean,
     channels: channel[],
 }
+
+export type aux = {
+    number: number,
+    order: number,
+    name: string,
+    hidden: boolean,
+    stereo: boolean,
+    color: string,
+}

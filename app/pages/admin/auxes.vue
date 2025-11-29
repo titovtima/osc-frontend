@@ -1,6 +1,10 @@
 <template>
   <div>
-    <ChannelSetup v-for="(_, index) in channels" v-model:channel="channels[index]" 
+    <div>
+      number, order, name, hidden, stereo, color
+    </div>
+    <AuxSetup 
+      v-for="(_, index) in channels" v-model="channels[index]" 
       @delete="() => { channels = channels.filter((_, delInd) => delInd != index) }"/>
     <button @click="addChannel">+</button>
     <button @click="save">Save</button>
@@ -8,13 +12,14 @@
 </template>
 
 <script setup lang="ts">
-const channels: Ref<any[]> = ref([]);
+const channels: Ref<aux[]> = ref([]);
 
 let config: any;
 getConfig().then(res => {
   config = res;
   fetch('http://' + config.host + '/auxes').then(res => res.json()).then(res => {
-      channels.value = res.auxes;
+    console.log(res);
+    channels.value = res.auxes;
   });
 })
 
@@ -23,7 +28,7 @@ function addChannel() {
   for (let channel of channels.value) {
     maxNum = Math.max(maxNum, channel.number);
   }
-  channels.value.push({number: maxNum+1, name: 'aux ' + (maxNum+1), color: 'ffffff'})
+  channels.value.push({number: maxNum+1, order: maxNum + 1, name: 'aux ' + (maxNum+1), hidden: false, stereo: true, color: 'ffffff'})
 }
 
 function save() {

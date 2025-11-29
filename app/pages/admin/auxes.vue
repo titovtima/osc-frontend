@@ -54,7 +54,7 @@ function save() {
 function check(): boolean {
   for (let i1 = 0; i1 < channels.value.length; i1++) {
     for (let i2 = 0; i2 < channels.value.length; i2++) {
-      if (i1 != i2 && channels.value[i1].number == channels.value[i2].number) {
+      if (i1 != i2 && channels.value[i1].number == channels.value[i2].number && !channels.value[i1].hidden && !channels.value[i2].hidden) {
         return false
       }
     }

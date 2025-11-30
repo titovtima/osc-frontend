@@ -360,8 +360,13 @@ onDeactivated(() => {
   text-align: center;
 }
 
-.active {
-  border-color: #000000 #535353 #535353 #000000 !important;
+.pan-show-btn {
+  border-color: #535353 #000000 #000000 #53535300;
+  border-style: solid;
+}
+
+.pan-show-btn.active {
+  border-color: #000000 #535353 #535353 #000000;
   border-style: solid;
 }
 

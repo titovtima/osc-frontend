@@ -7,10 +7,12 @@ export const logBase = 2;
 export const logPow = 4;
 
 export function sliderToDb(value: number): number {
-  if (value == minValue) return -150;
-  if (value >= 50) return 0.4*value - 30;
-  if (value >= 15) return (30*value - 1850)/35.0
-  return Math.log(value / 15.0 * (Math.pow(logBase, logPow) - 1) + 1) / Math.log(logBase) * 50 / logPow - 90;
+  let result;
+  if (value == minValue) result = -150;
+  else if (value >= 50) result = 0.4*value - 30;
+  else if (value >= 15) result = (30*value - 1850)/35.0;
+  else result = Math.log(value / 15.0 * (Math.pow(logBase, logPow) - 1) + 1) / Math.log(logBase) * 50 / logPow - 90;
+  return Math.round(result / step) * step;
   // return ((Math.log(value*(logBase - 1)/(maxValue - minValue) + (1 - minValue)) / Math.log(logBase)) * (maxDbValue - minDbValue)) + minDbValue;
 }
 
@@ -27,7 +29,7 @@ export const minPanValue = -1;
 export const panStep = 0.01;
 
 export function sliderToPan(value: number): number {
-  return value / 50 - 1;
+  return Math.round(value * 2 - 100) / 100;
 }
 
 export function panToSlider(pan: number): number {

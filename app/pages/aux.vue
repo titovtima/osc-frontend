@@ -195,6 +195,7 @@ function sendPanToServer(channel: number, value: number) {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden; /* Prevent double scrollbars */
 }
 

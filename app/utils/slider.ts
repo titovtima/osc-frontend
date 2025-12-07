@@ -1,6 +1,7 @@
 export const maxValue = 100;
 export const minValue = 0;
 export const step = 0.5;
+export const minusInfDb = -150;
 export const minDbValue = -90;
 export const maxDbValue = 10;
 export const logBase = 2;
@@ -8,7 +9,7 @@ export const logPow = 4;
 
 export function sliderToDb(value: number): number {
   let result;
-  if (value == minValue) result = -150;
+  if (value == minValue) result = minusInfDb;
   else if (value >= 50) result = 0.4*value - 30;
   else if (value >= 15) result = (30*value - 1850)/35.0;
   else result = Math.log(value / 15.0 * (Math.pow(logBase, logPow) - 1) + 1) / Math.log(logBase) * 50 / logPow - 90;

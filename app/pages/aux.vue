@@ -9,6 +9,11 @@
             <button class="scale-button" @click="scaleMinus">-</button>
             <button class="scale-button" @click="scalePlus">+</button>
           </div>
+          <div>
+            All channels: 
+            <button class="scale-button" @click="() => allChannelsPlus(-5)">-5</button>
+            <button class="scale-button" @click="() => allChannelsPlus(5)">+5</button>
+          </div>
         </div>
         <div class="aux-selector-container">
           <label class="aux-selector-label">AUX Bus:</label>
@@ -168,11 +173,11 @@ function sendLevelToServer(channel: number, value: number) {
   let aux = currentAuxNum.value;
   if (ws && ws.readyState === WebSocket.OPEN) {
     if (config.consoleType == 's') {
-      ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/level', args: [value]}))
+      ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/level', args: [value]}));
     } else {
       ws.send(JSON.stringify({address: '/sd/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_level', 
       // ws.send(JSON.stringify({address: '/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_level', 
-        args: [dbToSlider(value) / 100.0]}))
+        args: [dbToSlider(value) / 100.0]}));
     }
     levels.value[aux][channel] = value;
   }
@@ -182,13 +187,24 @@ function sendPanToServer(channel: number, value: number) {
   let aux = currentAuxNum.value;
   if (ws && ws.readyState === WebSocket.OPEN) {
     if (config.consoleType == 's') {
-      ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/pan', args: [value]}))
+      ws.send(JSON.stringify({address: '/channel/' + channel + '/send/' + aux + '/pan', args: [value]}));
     } else {
       ws.send(JSON.stringify({address: '/sd/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_pan',
       // ws.send(JSON.stringify({address: '/Input_Channels/' + channel + '/Aux_Send/' + aux + '/send_pan',
-        args: [panToSlider(value) / 100.0]}))
+        args: [panToSlider(value) / 100.0]}));
     }
     pans.value[aux][channel] = value;
+  }
+}
+
+function allChannelsPlus(value: number) {
+  let aux = currentAuxNum.value;
+  for (let channel of channels.value.flatMap(group => group.channels)) {
+    levels.value[aux][channel.number] = levels.value[aux][channel.number] + value;
+    // levels.value[aux][channel.number] = Math.min(levels.value[aux][channel.number] + value, maxDbValue);
+    // if (levels.value[aux][channel.number] < minDbValue)
+      // levels.value[aux][channel.number] = minusInfDb;
+    sendLevelToServer(channel.number, levels.value[aux][channel.number]);
   }
 }
 

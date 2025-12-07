@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%; overflow: auto;">
     <ChannelGroupSetup v-for="(_, index) in channelGroups" v-model="channelGroups[index]" 
       @delete="() => { channelGroups = channelGroups.filter((_, delInd) => delInd != index) }"/>
     <button @click="addGroup">+</button>

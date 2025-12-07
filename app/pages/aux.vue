@@ -200,7 +200,8 @@ function sendPanToServer(channel: number, value: number) {
 function allChannelsPlus(value: number) {
   let aux = currentAuxNum.value;
   for (let channel of channels.value.flatMap(group => group.channels)) {
-    levels.value[aux][channel.number] = levels.value[aux][channel.number] + value;
+    if (levels.value[aux][channel.number] > minusInfDb)
+      levels.value[aux][channel.number] = levels.value[aux][channel.number] + value;
     // levels.value[aux][channel.number] = Math.min(levels.value[aux][channel.number] + value, maxDbValue);
     // if (levels.value[aux][channel.number] < minDbValue)
       // levels.value[aux][channel.number] = minusInfDb;

@@ -2,7 +2,13 @@
   <div class="mixer-container">
     <div class="mixer-header">
       <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-        <h1 class="mixer-title">Istok AUX Mixer</h1>
+        <!-- <h1 class="mixer-title">Istok AUX Mixer</h1> -->
+        <div>
+          <div class="status-indicator" :class="{ connected: wsConnected }">
+            {{ wsConnected ? 'Connected' : 'Disconnected' }}
+          </div>
+          <SaveLoadButtons @save="name => saveAux(name)" @load="data => loadAuxFromFile(data)"/>
+        </div>
         <div>
           <div>
             Scale: 
@@ -13,9 +19,6 @@
             All channels: 
             <button class="scale-button" @click="() => allChannelsPlus(-5)">-5</button>
             <button class="scale-button" @click="() => allChannelsPlus(5)">+5</button>
-          </div>
-          <div class="status-indicator" :class="{ connected: wsConnected }">
-            {{ wsConnected ? 'Connected' : 'Disconnected' }}
           </div>
         </div>
       </div>
@@ -198,6 +201,45 @@ function allChannelsPlus(value: number) {
     // if (levels.value[aux][channel.number] < minDbValue)
       // levels.value[aux][channel.number] = minusInfDb;
     sendLevelToServer(channel.number, levels.value[aux][channel.number]);
+  }
+}
+
+function saveAuxToString(): string {
+  let save: any = {
+    levels: levels.value[currentAuxNum.value],
+  };
+  if (currentAux.value.stereo) {
+    save.pans = pans.value[currentAuxNum.value];
+  }
+  return JSON.stringify(save);
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+const localStorageSavingPrefixKey = 'saveAux_'
+function saveAux(name: string) {
+  let str = saveAuxToString();
+  localStorage.setItem(localStorageSavingPrefixKey + name, str);
+  let a = document.createElement('a');
+  let file = new Blob([str], {type: 'application/json'});
+  a.href = URL.createObjectURL(file);
+  a.download = name + '.json';
+  a.click();
+}
+
+async function loadAuxFromFile(dataPromise: any) {
+  let data = await dataPromise;
+  console.log(data);
+  if (data.levels) {
+    levels.value[currentAuxNum.value] = data.levels;
+  }
+  if (data.pans) {
+    pans.value[currentAuxNum.value] = data.pans;
+  }
+  for (let group of channels.value) {
+    for (let channel of group.channels) {
+      sendLevelToServer(channel.number, levels.value[currentAuxNum.value][channel.number]);
+      if (currentAux.value.stereo)
+        sendPanToServer(channel.number, pans.value[currentAuxNum.value][channel.number]);
+    }
   }
 }
 

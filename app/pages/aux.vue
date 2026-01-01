@@ -94,6 +94,8 @@ function selectGroupByName(name: string) {
   let f = channels.value.filter(group => group.name == name);
   if (f.length > 0 && f[0])
     currentGroup.value = f[0];
+  else
+    currentGroup.value = null;
 }
 
 let config: any
@@ -109,7 +111,6 @@ getConfig().then(res => {
   fetch('http://' + config.host + "/channels").then(res => res.json()).then((res: {channels: channelGroup[]}) => {
     res.channels.sort((a, b) => a.order - b.order);
     channels.value = res.channels;
-    console.log(res);
     createWs();
   });
 
@@ -131,6 +132,12 @@ function createWs() {
 
   ws.onmessage = (event) => {
     let data = JSON.parse(event.data);
+    if (data.address == 'channels') {
+      channels.value = data.args[0].channels;
+      if (currentGroup.value)
+        selectGroupByName(currentGroup.value.name);
+      return;
+    }
     let addrLevels: string[] = data.address.split('/');
     if (config.consoleType == 's') {
       if (addrLevels.length == 6 && addrLevels[1] == 'channel' && addrLevels[3] == 'send' && addrLevels[5] == 'level') {

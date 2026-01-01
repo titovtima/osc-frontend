@@ -10,6 +10,14 @@
           <SaveLoadButtons @save="name => saveAux(name)" @load="data => loadAuxFromFile(data)"/>
         </div>
         <div>
+          <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
+            pan
+          </button>
+          <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: !panShow }" style="float: right;">
+            lvl
+          </button>
+        </div>
+        <div>
           <div>
             Scale: 
             <button class="scale-button" @click="scaleMinus">-</button>
@@ -50,6 +58,7 @@ const currentAux: Ref<aux> = useState('currentAux', () => {
   return {number: 0, order: 1, name: "aux 0", hidden: false, stereo: true, color: "ffffff"}});
 const currentAuxNum = computed(() => currentAux.value.number);
 const wsConnected = ref(false);
+const panShow = useState('globalPanShow', () => false);
 
 const channels: Ref<channelGroup[]> = ref([{name: "group 0", order: 1, hidden: true, channels: []}]);
 const auxes: Ref<aux[]> = ref([{number: 0, order: 1, name: "aux 0", hidden: false, stereo: true, color: "ffffff"}]);
@@ -383,6 +392,24 @@ onMounted(() => {
   font-size: 0.9rem;
   color: #00b4db;
   font-weight: 500;
+}
+
+.pan-show-btn {
+  font-size: 0.8rem;
+  color: #00b4db;
+  font-weight: 600;
+  background: rgba(0, 180, 219, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  min-width: 30px;
+  text-align: center;
+  border-color: #535353 #000000 #000000 #53535300;
+  border-style: solid;
+}
+
+.pan-show-btn.active {
+  border-color: #000000 #535353 #535353 #000000;
+  border-style: solid;
 }
 
 @media (max-width: 768px) {

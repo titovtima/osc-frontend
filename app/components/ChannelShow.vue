@@ -4,10 +4,10 @@
       <div class="channel-number">{{ data.number }}</div>
       <div class="channel-name">{{ data.name }}</div>
       <span v-if="currentAux.stereo">
-        <button @click="panShow = true" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
+        <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
           pan
         </button>
-        <button @click="panShow = false" class="pan-show-btn" :class="{ active: !panShow }" style="float: right;">
+        <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: !panShow }" style="float: right;">
           lvl
         </button>
       </span>
@@ -116,13 +116,17 @@ let props = defineProps<{
   pan: number,
 }>();
 
-let emit = defineEmits(['update:level', 'update:pan']);
+const emit = defineEmits(['update:level', 'update:pan']);
 
-let bar = ref();
-let barContainer = ref();
-let panElem = ref();
-let panContainer = ref();
-let panShow = ref(false);
+const bar = ref();
+const barContainer = ref();
+const panElem = ref();
+const panContainer = ref();
+const globalPanShow = useState('globalPanShow', () => false);
+const panShow = ref(false);
+watch(globalPanShow, value => {
+  panShow.value = value;
+});
 
 let panRef = ref(props.pan);
 watch(() => props.pan, () => {

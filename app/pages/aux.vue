@@ -9,7 +9,7 @@
           </div>
           <SaveLoadButtons @save="name => saveAux(name)" @load="data => loadAuxFromFile(data)"/>
         </div>
-        <div>
+        <div v-if="currentAux.stereo">
           <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
             pan
           </button>

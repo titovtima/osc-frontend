@@ -8,7 +8,7 @@
     </div>
   </div>
   <div v-else>
-    <div v-for="option in list" @click="() => $emit('select', option)"
+    <div v-for="option in showList" @click="() => $emit('select', option)"
         class="item" :class="{selected : selected == option}">
       {{ option }}
     </div>
@@ -24,11 +24,15 @@ const props = defineProps({
   selected: [String, null],
   scroll: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
+  reorder: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const showList = computed(() => props.selected && props.list.includes(props.selected) ? 
+const showList = computed(() => props.reorder && props.selected && props.list.includes(props.selected) ? 
   [props.selected].concat(props.list.filter(value => value != props.selected)) : props.list);
 
 defineEmits<{

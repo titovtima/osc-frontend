@@ -32,7 +32,7 @@
       </div>
 
       <span style="padding: 0.25rem;">Aux:</span>
-      <SelectChannel scroll :list="auxes.map(aux => aux.name)" :selected="currentAux.name" @select="aux => changeAuxByName(aux)"/>
+      <SelectChannel scroll reorder :list="auxes.map(aux => aux.name)" :selected="currentAux.name" @select="aux => changeAuxByName(aux)"/>
       <span style="padding: 0.25rem;">Groups:</span>
       <SelectChannel scroll :list="channels.filter(group => !group.hidden).map(group => group.name)"
         :selected="currentGroup ? currentGroup.name : null"

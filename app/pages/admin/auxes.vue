@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; overflow: auto;">
+  <div style="height: 100dvh; overflow: auto;">
     <div>
       number, order, name, hidden, stereo, color
     </div>

@@ -1,11 +1,16 @@
 <template>
-  <div v-if="scroll" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-    <div style="width: max-content;">
-      <div v-for="option in showList" @click="() => $emit('select', option)"
-          class="item" :class="{selected : selected == option}">
-        {{ option }}
+  <div v-if="scroll" style="display: flex; flex-direction: row;">
+    <span v-if="reorder && selected" class="selected item" style="flex: 0 1 5rem;">
+      {{ selected }}
+    </span>
+    <span style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+      <div style="width: max-content;">
+        <div v-for="option in showList" @click="() => $emit('select', option)"
+            class="item" :class="{selected : selected == option}">
+          {{ option }}
+        </div>
       </div>
-    </div>
+    </span>
   </div>
   <div v-else>
     <div v-for="option in showList" @click="() => $emit('select', option)"
@@ -32,8 +37,9 @@ const props = defineProps({
   },
 });
 
-const showList = computed(() => props.reorder && props.selected && props.list.includes(props.selected) ? 
-  [props.selected].concat(props.list.filter(value => value != props.selected)) : props.list);
+const showList = computed(() => props.list);
+// const showList = computed(() => props.reorder && props.selected && props.list.includes(props.selected) ? 
+  // [props.selected].concat(props.list.filter(value => value != props.selected)) : props.list);
 
 defineEmits<{
   select: [option: string]

@@ -3,14 +3,6 @@
     <div class="channel-header">
       <div class="channel-number">{{ data.number }}</div>
       <div class="channel-name">{{ data.name }}</div>
-      <span v-if="currentAux.stereo">
-        <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: panShow }" style="float: right;">
-          pan
-        </button>
-        <button @click="panShow = !panShow" class="pan-show-btn" :class="{ active: !panShow }" style="float: right;">
-          lvl
-        </button>
-      </span>
     </div>
     
     <div class="controls-row">

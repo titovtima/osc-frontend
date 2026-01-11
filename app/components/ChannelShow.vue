@@ -113,7 +113,7 @@ const barContainer = ref();
 const panElem = ref();
 const panContainer = ref();
 const globalPanShow = useState('globalPanShow', () => false);
-const panShow = ref(false);
+const panShow = ref(globalPanShow.value);
 watch(globalPanShow, value => {
   panShow.value = value;
 });

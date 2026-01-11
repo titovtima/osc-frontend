@@ -243,20 +243,25 @@ function saveAux(name: string) {
 
 async function loadAuxFromFile(dataPromise: any) {
   let data = await dataPromise;
-  console.log(data);
-  if (data.levels) {
-    levels.value[currentAuxNum.value] = data.levels;
-  }
-  if (data.pans) {
-    pans.value[currentAuxNum.value] = data.pans;
-  }
-  for (let group of channels.value) {
-    for (let channel of group.channels) {
-      sendLevelToServer(channel.number, levels.value[currentAuxNum.value][channel.number]);
-      if (currentAux.value.stereo)
-        sendPanToServer(channel.number, pans.value[currentAuxNum.value][channel.number]);
+  let interval = setInterval(() => {
+    if (wsConnected.value) {
+      clearInterval(interval);
+      console.log(data);
+      if (data.levels) {
+        levels.value[currentAuxNum.value] = data.levels;
+      }
+      if (data.pans) {
+        pans.value[currentAuxNum.value] = data.pans;
+      }
+      for (let group of channels.value) {
+        for (let channel of group.channels) {
+          sendLevelToServer(channel.number, levels.value[currentAuxNum.value][channel.number]);
+          if (currentAux.value.stereo)
+            sendPanToServer(channel.number, pans.value[currentAuxNum.value][channel.number]);
+        }
+      }
     }
-  }
+  }, 200);
 }
 
 function scalePlus() {

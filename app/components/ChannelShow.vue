@@ -7,40 +7,39 @@
     
     <div class="controls-row">
       <!-- Level Control -->
-      <div v-if="!panShow || !currentAux.stereo" class="control-group">
+      <div v-if="!panShow || !currentAux.stereo" class="control-group noselect">
         <div style="display: flex; flex-direction: row; gap: 0.5rem; align-items: center;">
           <button 
-            class="control-button-small"
+            class="control-button-small noselect"
             style="flex: 0 1 2rem;"
             @click="decreaseLevel"
           >
             −
           </button>
           <div 
-            class="level-track-container"
+            class="level-track-container noselect"
             style="display: inline-block; flex: 1 1 3rem"
             ref="barContainer"
           >
             <div 
-              class="level-track-horizontal" 
+              class="level-track-horizontal noselect" 
               ref="bar"
-              @click="handleLevelClick"
             >
               <div 
-                class="level-fill-horizontal" 
+                class="level-fill-horizontal noselect" 
                 :style="{ width: dbToSlider(levelRef) * 100 / maxValue + '%' }"
               ></div>
             </div>
             <div 
-              class="level-handle-horizontal" 
+              class="level-handle-horizontal noselect" 
               :style="{ left: dbToSlider(levelRef) * 100 / maxValue + '%' }"
               @pointerdown="startLevelDrag"
             >
-              <div class="level-value">{{ formatLevelValue(levelRef) }}</div>
+              <div class="level-value noselect">{{ formatLevelValue(levelRef) }}</div>
             </div>
           </div>
           <button 
-            class="control-button-small"
+            class="control-button-small noselect"
             style="flex: 0 1 2rem;"
             @click="increaseLevel"
           >
@@ -52,44 +51,43 @@
       </div>
 
       <!-- Pan Control -->
-      <div v-else class="control-group">
+      <div v-else class="control-group noselect">
         <div style="display: flex; flex-direction: row; gap: 0.5rem;">
           <button 
-            class="control-button-small"
+            class="control-button-small noselect"
             style="flex: 0 1 2rem;"
             @click="decreasePan"
           >
             L
           </button>
           <div 
-            class="pan-track-container"
+            class="pan-track-container noselect"
             style="flex: 1 1 3rem;"
             ref="panContainer"
           >
             <div 
-              class="pan-track-horizontal" 
+              class="pan-track-horizontal noselect" 
               ref="panElem"
-              @click="handlePanClick"
             >
-              <div class="pan-center-marker"></div>
+              <div class="pan-center-marker noselect"></div>
             </div>
             <div 
-              class="pan-handle-horizontal" 
+              class="pan-handle-horizontal noselect" 
               :style="{ left: panToSlider(panRef) + '%' }"
               @pointerdown="startPanDrag"
             >
-              <div class="pan-value">{{ formatPanValue(panRef) }}</div>
+              <div class="pan-value noselect">{{ formatPanValue(panRef) }}</div>
             </div>
           </div>
           <button 
-            class="control-button-small"
+            class="control-button-small noselect"
             style="flex: 0 1 2rem;"
             @click="centerPan"
           >
             C
           </button>
           <button 
-            class="control-button-small"
+            class="control-button-small noselect"
             style="flex: 0 1 2rem;"
             @click="increasePan"
           >
@@ -183,28 +181,28 @@ function centerPan() {
   emit('update:pan', 0);
 }
 
-// Click handlers
-function handleLevelClick(event: MouseEvent) {
-  if (isLevelDragging) return;
+// // Click handlers
+// function handleLevelClick(event: MouseEvent) {
+//   if (isLevelDragging) return;
   
-  const rect = bar.value.getBoundingClientRect();
-  const newValue = ((event.clientX - rect.left) / rect.width) * maxValue;
-  const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
-  console.log('clampedValue', clampedValue);
-  levelRef.value = sliderToDb(clampedValue);
-  console.log('levelRef', levelRef.value);
-  emit('update:level', levelRef.value);
-}
+//   const rect = bar.value.getBoundingClientRect();
+//   const newValue = ((event.clientX - rect.left) / rect.width) * maxValue;
+//   const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
+//   console.log('clampedValue', clampedValue);
+//   levelRef.value = sliderToDb(clampedValue);
+//   console.log('levelRef', levelRef.value);
+//   emit('update:level', levelRef.value);
+// }
 
-function handlePanClick(event: MouseEvent) {
-  if (isPanDragging) return;
+// function handlePanClick(event: MouseEvent) {
+//   if (isPanDragging) return;
   
-  const rect = panElem.value.getBoundingClientRect();
-  const newValue = ((event.clientX - rect.left) / rect.width) * 100;
-  const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
-  panRef.value = sliderToPan(clampedValue);
-  emit('update:pan', panRef.value);
-}
+//   const rect = panElem.value.getBoundingClientRect();
+//   const newValue = ((event.clientX - rect.left) / rect.width) * 100;
+//   const clampedValue = Math.max(minValue, Math.min(maxValue, newValue));
+//   panRef.value = sliderToPan(clampedValue);
+//   emit('update:pan', panRef.value);
+// }
 
 // Optimized drag handlers for smooth movement
 function startLevelDrag(event: PointerEvent) {
@@ -400,7 +398,7 @@ onDeactivated(() => {
 .level-track-container {
   position: relative;
   height: 2rem;
-  touch-action: none; /* Prevent scrolling when dragging */
+  /* touch-action: none; Prevent scrolling when dragging */
 }
 
 .level-track-horizontal {
@@ -459,7 +457,7 @@ onDeactivated(() => {
 .pan-track-container {
   position: relative;
   height: 2rem;
-  touch-action: none;
+  /* touch-action: none; */
 }
 
 .pan-track-horizontal {
@@ -589,5 +587,17 @@ onDeactivated(() => {
     background: rgba(0, 0, 0, 0.4) !important;
     transform: none !important;
   }
+}
+</style>
+
+<style>
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div v-if="scroll" style="display: flex; flex-direction: row;">
-    <span v-if="reorder && selected" class="selected item" style="flex: 0 1 5rem;">
+    <span v-if="reorder && selected" class="item" style="flex: 0 1 5rem; min-width: max-content; background-color: #00b4db;">
       {{ selected }}
     </span>
     <span style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -65,5 +65,6 @@ defineEmits<{
 
 .selected.item {
   background: #555555;
+  border: 1px solid #27ae60;
 }
 </style>

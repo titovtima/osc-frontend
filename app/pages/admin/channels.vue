@@ -60,10 +60,12 @@ function check(): boolean {
       }
       for (let channel1 of group1.channels) {
         for (let channel2 of group2.channels) {
-          if (channel1 != channel2 && channel1.number == channel2.number) {
+          if (channel1 != channel2 && channel1.number == channel2.number && 
+              !channel1.hidden && !channel2.hidden && !group1.hidden && !group2.hidden) {
             alert('channels ' + channel1.name + ' and ' + channel2.name + ' have the same number');
             return false
-          } else if (channel1 != channel2 && group1 == group2 && channel1.order == channel2.order) {
+          } else if (channel1 != channel2 && group1 == group2 && channel1.order == channel2.order && 
+              !channel1.hidden && !channel2.hidden) {
             alert('channels ' + channel1.name + ' and ' + channel2.name + ' have the same order in one group');
             return false
           }
